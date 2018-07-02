@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 
 import { register } from 'register-service-worker'
+import Firebase from './services/firebase'
+
+const messaging = Firebase.messaging()
 
 if (process.env.NODE_ENV === 'production') {
   register(`${process.env.BASE_URL}service-worker.js`, {
@@ -10,11 +13,16 @@ if (process.env.NODE_ENV === 'production') {
         'For more details, visit https://goo.gl/AFskqB'
       )
     },
-    cached () {
+    registered (registration) {
+      console.log('Service worker has been registered.')
+      messaging.useServiceWorker(registration)
+    },
+    cached (registration) {
       console.log('Content has been cached for offline use.')
     },
-    updated () {
+    updated (registration) {
       console.log('New content is available; please refresh.')
+      messaging.useServiceWorker(registration)
     },
     offline () {
       console.log('No internet connection found. App is running in offline mode.')
