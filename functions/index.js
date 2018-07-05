@@ -12,19 +12,25 @@ admin.initializeApp(functions.config().firebase)
 
 // exports.sendCreateWebTool = functions.firestore.document('web-tools/{webToolId}').onCreate((snap, context) => {
 exports.sendCreatePost = functions.firestore.document('posts/{id}').onCreate((snap, context) => {
-  // var { title, version } = snap.data()
   var { title, body } = snap.data()
-  admin.firestore().collection('subscribers').get().then(snapshot => snapshot.forEach(doc => {
+
+  return admin.firestore().collection('subscribers').get().then(snapshot => snapshot.forEach(doc => {
     var { token } = doc.data()
     var payload = {
       notification: {
         title,
+        body,
         icon: '/img/icons/android-chrome-192x192.png',
-        body
+        click_action: '/post/id'
+      },
+      data: {
+        badge: '/img/icons/android-chrome-192x192.png'
       }
     }
 
     admin.messaging().sendToDevice(token, payload).then(response => response.results.forEach(result => {
+      console.log('Success delivery to', token, result)
+
       if (result.error) {
         console.error('Failed delivery to', token, result.error)
 
@@ -33,11 +39,9 @@ exports.sendCreatePost = functions.firestore.document('posts/{id}').onCreate((sn
           doc.delete()
           console.info('Was removed:', token)
         }
-      } else {
-        console.info('Notification sent to', token)
-      }
-    })).catch(error => error)
-  })).catch(error => error)
+      } else console.info('Notification sent to', token)
+    })).catch(error => { console.error('Error sending to', token, error) })
+  })).catch(error => { console.error('Error getting subscribers', error) })
   // })).catch(error => {
   //   console.error('Unable to send notification', error)
   // })

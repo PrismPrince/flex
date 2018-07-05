@@ -2,7 +2,7 @@
   <div id="app">
     Token: {{ userToken }}<br>
     <button v-if="userToken === null" @click="subscribe">Subscribe</button>
-    <button v-if="userToken !== null" @click="unsubscribe">Unubscribe</button>
+    <button v-if="userToken !== null" @click="unsubscribe">Unsubscribe</button>
     <br>
     <button @click="post">Post</button>
     <br>

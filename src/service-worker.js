@@ -47,25 +47,12 @@ messaging.setBackgroundMessageHandler(payload => {
   // return self.registration.showNotification(notificationTitle, notificationOptions);
 
   var { title, icon, body } = payload.notification;
+  var { badge } = payload.data;
 
   return self.registration.showNotification(title, {
     icon,
-    body ,
-    vibrate: [300, 100, 400, 100, 300],
-    badge: icon
-  }).then(event => {
-    event.notification.onclick = () => {
-      event.notification.close();
-
-      // event.waitUntil(self.clients.openWindow('https://ez-js-101.firebaseapp.com/'))
-
-      event.waitUntil(self.clients.matchAll({ type: "window" }).then(clientList =>  {
-        for (var i = 0; i < clientList.length; i++)
-          if (clientList[i].url == '/' && 'focus' in clientList[i])
-            return clientList[i].focus();
-        if ('openWindow' in self.clients) return self.clients.openWindow('/');
-      }));
-    };
-  });
+    body,
+    badge,
+    vibrate: [300, 100, 400, 100, 300]
+  })
 });
-// [END background_handler]
